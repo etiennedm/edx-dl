@@ -5,6 +5,7 @@ Parsing and extraction functions
 """
 import re
 import json
+import logging
 
 from datetime import timedelta, datetime
 
@@ -161,7 +162,9 @@ class ClassicEdXPageExtractor(PageExtractor):
         # exclude the ';' # character in the urls, since it is used to separate
         # multiple urls in one string, however ';' is a valid url name
         # character, but it is not really common.
-        re_mp4_urls = re.compile(r'(?:(https?://[^;]*?\.mp4))')
+
+        # Only return SD quality videos
+        re_mp4_urls = re.compile(r'(?:(https?://[^;]*?SD\.mp4))')
         mp4_urls = list(set(re_mp4_urls.findall(text)))
 
         return mp4_urls
@@ -308,6 +311,13 @@ class CurrentEdXPageExtractor(ClassicEdXPageExtractor):
                                 available_subs_url=available_subs_url,
                                 sub_template_url=sub_template_url,
                                 mp4_urls=mp4_urls))
+
+        # Find all mp4 videos on page
+        mp4_urls = self.extract_mp4_urls(text)
+        videos.append(Video(video_youtube_url=None,
+                            available_subs_url=None,
+                            sub_template_url=None,
+                            mp4_urls=mp4_urls))
 
         resources_urls = self.extract_resources_urls(text, BASE_URL,
                                                      file_formats)
