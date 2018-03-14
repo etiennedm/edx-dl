@@ -11,6 +11,7 @@ import logging
 import os
 import string
 import subprocess
+import unicodedata
 
 
 def get_filename_from_prefix(target_dir, filename_prefix):
@@ -135,6 +136,7 @@ def clean_filename(s, minimal_change=False):
 
     s = s.replace('(', '').replace(')', '')
     s = s.rstrip('.')  # Remove excess of trailing dots
+    s = unicodedata.normalize('NFKD', s) # Remove diacritics (é, à, ô, etc)
 
     s = s.strip().replace(' ', '_')
     valid_chars = '-_.()%s%s' % (string.ascii_letters, string.digits)
